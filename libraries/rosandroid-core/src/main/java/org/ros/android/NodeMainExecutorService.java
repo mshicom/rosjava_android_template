@@ -20,6 +20,8 @@ import com.google.common.base.Preconditions;
 
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.app.NotificationManager;
+
 import android.app.Service;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
@@ -172,14 +174,27 @@ public class NodeMainExecutorService extends Service implements NodeMainExecutor
     if (intent.getAction().equals(ACTION_START)) {
       Preconditions.checkArgument(intent.hasExtra(EXTRA_NOTIFICATION_TICKER));
       Preconditions.checkArgument(intent.hasExtra(EXTRA_NOTIFICATION_TITLE));
-      Notification notification =
-          new Notification(R.drawable.icon, intent.getStringExtra(EXTRA_NOTIFICATION_TICKER),
-              System.currentTimeMillis());
+
+//      Notification notification =
+//          new Notification(R.drawable.icon, intent.getStringExtra(EXTRA_NOTIFICATION_TICKER),
+//              System.currentTimeMillis());
+//      Intent notificationIntent = new Intent(this, NodeMainExecutorService.class);
+//      notificationIntent.setAction(NodeMainExecutorService.ACTION_SHUTDOWN);
+//      PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, 0);
+//      notification.setLatestEventInfo(this, intent.getStringExtra(EXTRA_NOTIFICATION_TITLE),
+//          "Tap to shutdown.", pendingIntent);
+
       Intent notificationIntent = new Intent(this, NodeMainExecutorService.class);
-      notificationIntent.setAction(NodeMainExecutorService.ACTION_SHUTDOWN);
       PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, 0);
-      notification.setLatestEventInfo(this, intent.getStringExtra(EXTRA_NOTIFICATION_TITLE),
-          "Tap to shutdown.", pendingIntent);
+      Notification notification = new Notification.Builder(NodeMainExecutorService.this)
+              .setSmallIcon(R.drawable.icon)
+              .setTicker("Tap to shutdown.")
+              .setContentTitle(intent.getStringExtra(EXTRA_NOTIFICATION_TITLE))
+              .setContentIntent(pendingIntent)
+              .build();
+//      NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+//      notificationManager.notify(R.drawable.icon, notification);
+
       startForeground(ONGOING_NOTIFICATION, notification);
     }
     if (intent.getAction().equals(ACTION_SHUTDOWN)) {
